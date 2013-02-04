@@ -114,3 +114,66 @@ plot(hC)
 hC=hclust(dist(t(log10(trainSpam[,1:55]+1))))
 plot(hC)
 
+### 3 QUIZZ 2
+
+fileUrl="http://simplystatistics.tumblr.com/"
+con <- url(fileUrl)
+v=readLines(con,n=150)
+close(con)
+head(v)
+?nchar
+nchar(v[2])
+nchar(v[45])
+nchar(v[122])
+n=lapply(v,nchar) 
+head(v)
+head(n)
+
+fileUrl="https://dl.dropbox.com/u/7710864/data/csv_hid/ss06hid.csv"
+download.file(fileUrl,destfile="./data/houses.csv")
+dateDownload <- date()
+list.files("./data")
+hData <- read.csv("./data/houses.csv")
+head(hData)
+dim(hData)
+head(hData[,c('VAL')])
+table(hData[hData$VAL==24,c('VAL')])
+val=hData$VAL
+h.freq = table(val)      
+h.freq
+cbind(table(hData$VAL)      )
+#How many households have 3 bedrooms and and 4 total rooms? 
+#How many households have 2 bedrooms and 5 total rooms? 
+#How many households have 2 bedrooms and 7 total rooms?
+table(is.na(hData[hData$BDS==3 & hData$RMS==4 & hData$BDS != NA  & hData$RMS != NA,c('BDS','RMS')]))
+table(is.na(hData[hData$BDS==2 & hData$RMS==5 & hData$BDS != NA  & hData$RMS != NA,c('BDS','RMS')]))
+table(is.na(hData[hData$BDS==2 & hData$RMS==7 & hData$BDS != NA  & hData$RMS != NA,c('BDS','RMS')]))
+table(hData$BDS==3 & hData$RMS==4)
+table(hData$BDS==2 & hData$RMS==5)
+table(hData$BDS==2 & hData$RMS==7)
+
+
+agricultureLogical =   as.vector(hData$ACR==3 & hData$AGS==6)
+indexes =  which(agricultureLogical) 
+subsetDataFrame  = hData[indexes,] 
+table(subsetDataFrame$MRGX,useNA="always")
+dim(subsetDataFrame)
+head(which(agricultureLogical) )
+
+quantile(hData$YBL,na.rm=T)
+summary(hData)
+nm=names(hData)
+s=cat(nm)
+strsplit(nm[1],split="wgtp")
+sapply(nm,strsplit(split="wgtp"))
+
+strsplit("wgtp55","wgtp")
+
+
+fPop="https://dl.dropbox.com/u/7710864/data/csv_hid/ss06pid.csv"
+download.file(fPop,destfile="./data/pop.csv")
+dateDownload2 <- date()
+list.files("./data")
+pData <- read.csv("./data/pop.csv")
+mData<-merge(hData,pData,by.x="SERIALNO",by.y="SERIALNO",all=TRUE)
+dim(mData)
