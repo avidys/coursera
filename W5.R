@@ -60,6 +60,34 @@ source('~/Documents/R/coursera/agnostic.R')
 confint(glm1)
 confint.agnostic(glm1)
 
+glm2 <- glm(gaData$simplystats ~ julian(gaData$date),offset=log(visits+1),
+            family="poisson",data=gaData)
+plot(julian(gaData$date),glm2$fitted,col="blue",pch=19,xlab="Date",ylab="Fitted Counts")
+points(julian(gaData$date),glm1$fitted,col="red",pch=19)
+
+glm2 <- glm(gaData$simplystats ~ julian(gaData$date),offset=log(visits+1),
+            family="poisson",data=gaData)
+plot(julian(gaData$date),gaData$simplystats/(gaData$visits+1),col="grey",xlab="Date",
+     ylab="Fitted Rates",pch=19)
+lines(julian(gaData$date),glm2$fitted/(gaData$visits+1),col="blue",lwd=3)
+
 #data(waprbreaks)
 
 ### quizz
+
+data(warpbreaks)
+str(warpbreaks)
+head(warpbreaks)
+
+aov(warpbreaks$breaks ~ warpbreaks$wool + warpbreaks$tension)
+summary(aov(warpbreaks$breaks ~ warpbreaks$wool + warpbreaks$tension))
+
+p <- .2
+o <- p/(1-p)
+log(o)
+
+
+library(glm2)
+data(crabs)
+str(crabs)
+head(crabs)
