@@ -1,0 +1,1 @@
+https://class.coursera.org/healthinformatics-001/lecture/index

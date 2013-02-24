@@ -177,3 +177,174 @@ list.files("./data")
 pData <- read.csv("./data/pop.csv")
 mData<-merge(hData,pData,by.x="SERIALNO",by.y="SERIALNO",all=TRUE)
 dim(mData)
+
+#
+######### Week 3
+#
+fileUrl="https://dl.dropbox.com/u/7710864/data/csv_hid/ss06hid.csv"
+download.file(fileUrl,destfile="./data/ss06hid.csv")
+getwd()
+list.files("./data")
+pData <- read.csv("./data/ss06hid.csv")
+head(pData)
+boxplot(pData$AGEP,col="blue")
+
+
+plot(pData$JWMNP,pData$WAGEP,pch=19,col="blue",cex=.5)
+library(Hmisc)
+ageG=cut2(pData$AGEP,g=5)
+head(ageG)
+ageG
+plot(pData$JWMNP,pData$WAGEP,pch=19,col=ageG,cex=.5)
+
+#library(survival)
+
+x=rnorm(10000)
+y=rnorm(10000)
+plot(x,y,pch=19)
+s <- sample(1:10000,size=1000,replace=FALSE)
+plot(x[s],y[s],pch=19)
+head(s)
+smoothScatter(x,y)
+
+library(hexbin)
+h<-hexbin(x,y)
+plot(h)
+
+qqplot(x,y)
+abline(c(0,1))
+
+X <- matrix(rnorm(20*5),nrow=5)
+matplot(X,typ="b")
+
+image(1:5,1:20,X)
+#m <- as.matrix(pData[1:10,200:400])
+tm <- t(X)[,nrow(X):1]
+image(1:20,1:5,tm)
+
+library(maps)
+map("france")
+points(0,0,pch=19,col="red")
+points(0,45,pch=19,col="red")
+
+x <- c(NA,NA,NA,4,5,6,7,8,9,10)
+y <- 1:10
+plot(x,y)
+plot(x,y,pch=19,xlim=c(0,11),ylim=c(0,11))
+
+x <- rnorm(150)
+y <- rnorm(150)
+y[x < 0] <- NA
+?boxplot(x ~ is.na(y),varwidth=T,)
+
+
+#ggplot2#
+#
+#
+# Quizz W3
+#
+
+#Q
+library(datasets)
+data(iris)
+irisSubset <- iris[,1:4]
+head(iris)
+dataFrame <- data.frame(x=x,y=y)
+distxy <- dist(dataFrame)
+h <- dist(irisSubset)
+hClustering <- hclust(h)
+plot(hClustering)
+
+#Q
+download.file("https://spark-public.s3.amazonaws.com/dataanalysis/quiz3question4.rda",destfile="./data/quiz3question4.rda")
+#https://spark-public.s3.amazonaws.com/dataanalysis/quiz3question4.csv 
+load("./data/quiz3question4.rda")
+head(dataSet)
+plot(dataSet)
+
+kmeansObj <- kmeans(dataSet,centers=2,iter.max=30)
+names(kmeansObj)
+kmeansObj
+
+plot(dataSet,col=kmeansObj$cluster,pch=19,cex=.5)
+points(kmeansObj$centers,col=1:2,pch=3,cex=2,lwd=1)
+
+#dataFrame <- data.frame(x,y)
+#kmeansObj <- kmeans(dataFrame,centers=3)
+#names(kmeansObj)
+
+
+#
+# Q5
+#
+library(ElemStatLearn)
+data(zip.train)
+dim(zip.train)
+head(zip.train)
+im8 = zip2image(zip.train,8)
+im18 = zip2image(zip.train,18)
+image(im8)
+image(im18)
+svd8 <- svd(im8)
+svd18 <- svd(im18)
+svd8
+plot(svd8$d^2/sum(svd8$d^2),pch=19,xlab="Singluar vector",ylab="Variance explained")
+plot(svd18$d^2/sum(svd18$d^2),pch=19,xlab="Singluar vector",ylab="Variance explained")
+
+
+# W4
+########
+
+samsungData <- read.table("https://spark-public.s3.amazonaws.com/dataanalysis/samsungData.rda")
+download.file("https://spark-public.s3.amazonaws.com/dataanalysis/samsungData.rda",dest="./data/samsungData.rda")
+load("./data/samsungData.rda")
+dim(samsungData)
+str(samsungData)
+summary(samsungData)
+class(samsungData)
+names(samsungData)
+
+download.file("https://spark-public.s3.amazonaws.com/dataanalysis/hunger.csv", dest="hunger.csv")
+file.show("hunger.csv")
+hunger <- read.csv("https://spark-public.s3.amazonaws.com/dataanalysis/hunger.csv")
+str(hunger)
+
+
+income <- https://spark-public.s3.amazonaws.com/dataanalysis/income.csv
+movies <- https://spark-public.s3.amazonaws.com/dataanalysis/movies.txt
+
+
+download.file("https://spark-public.s3.amazonaws.com/dataanalysis/movies.txt",destfile="./data/movies.txt")
+movies <- read.table("./data/movies.txt",sep="\t",header=T,quote="")
+str(movies)
+summary(movies)
+head(movies)
+lm1 <- lm(movies$score ~ movies$box.office)
+#lm1 <- lm(movies$score ~ as.factor(movies$rating))
+summary(lm1)
+confint(lm1,level=.9)
+plot (movies$score ~ movies$box.office)
+
+lm2 <- lm(movies$score ~ movies$box.office + movies$running.time + movies$box.office * movies$running.time)
+summary(lm2)
+
+anova(lm(movies$box.office ~ movies$running.time))
+
+plot(movies$running.time ~ movies$score)
+
+lm2 <- lm(movies$score ~ movies$box.office + movies$running.time )
+summary(lm2)
+
+lm4 <- lm(movies$score ~ as.factor(movies$rating) + movies$running.time + as.factor(movies$rating) * movies$running.time)
+summary(lm4)
+
+data(warpbreaks)
+str(warpbreaks)
+lm3 <- lm(warpbreaks$breaks ~ relevel(as.factor(warpbreaks$tension),ref="H"))
+anova(lm3)
+confint(lm3,level=.95)
+table(warpbreaks$breaks , warpbreaks$tension)
+
+### W5
+
+data(waprbreaks)
