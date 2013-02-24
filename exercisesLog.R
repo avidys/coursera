@@ -345,6 +345,4 @@ anova(lm3)
 confint(lm3,level=.95)
 table(warpbreaks$breaks , warpbreaks$tension)
 
-### W5
 
-data(waprbreaks)
