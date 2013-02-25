@@ -79,15 +79,43 @@ data(warpbreaks)
 str(warpbreaks)
 head(warpbreaks)
 
-aov(warpbreaks$breaks ~ warpbreaks$wool + warpbreaks$tension)
-summary(aov(warpbreaks$breaks ~ warpbreaks$wool + warpbreaks$tension))
+aov(breaks ~ wool + tension, data=warpbreaks)
+summary(aov(breaks ~ wool + tension, data=warpbreaks))
 
 p <- .2
 o <- p/(1-p)
 log(o)
 
+22 * .164
 
 library(glm2)
 data(crabs)
 str(crabs)
 head(crabs)
+
+
+g2 <- glm(Satellites ~ Width,
+            family="poisson",data=crabs)
+g2
+summary(g2)
+
+#log(Sat) = .164 * w - 3.305
+#Sat = e-3.305.e.164*w
+c <- g2$coefficient
+#exp(c[1]) * exp(c[2])
+exp(0.164) 
+exp(-3.305) * exp(0.164 * 22)
+exp(-3.305 + 0.164 * 22)
+
+
+plot(crabs$Satellites,g2$fitted,col="blue",pch=19,xlab="Sat",ylab="Fitted Counts")
+plot(x=crabs$Satellites,y=crabs$width,col="blue",pch=19,xlab="Sat",ylab="width")
+points(crabs$Satellites,g2$fitted,col="red",pch=19)
+lines(crabs$Width,g2$fitted,col="red",lwd=3)
+abline(g2)
+
+library(MASS)
+data(quine) 
+lm1 <- lm(log(Days + 2.5) ~.,data=quine)
+aic <- step(lm1)
+aic

@@ -1,0 +1,161 @@
+Notes
+========================================================
+
+**MD** toolbar button for help on Markdown. **Knit HTML** generates a web page.
+
+General
+---------
+### Case for R vs SAS
+
+- Private R response: http://www.revolutionanalytics.com/products/revolution-enterprise.php
+- Poluparity: *http://r4stats.com/articles/popularity/*, https://sites.google.com/site/r4statistics/popularity
+- RevoscaleR: R on multiproc by RA
+- In pharma : http://blog.revolutionanalytics.com/2009/02/using-r-in-the-pharmaceutical-industry.html
+- Allstate: RevolutionR 50 time faster than SAS: http://blog.revolutionanalytics.com/2012/10/allstate-big-data-glm.html
+- Oracle/R link by oracle: http://www.theregister.co.uk/2012/02/10/oracle_advanced_analytics/
+- http://www.rdatamining.com/
+- R and Hadoop: http://blog.revolutionanalytics.com/2012/03/r-and-hadoop-step-by-step-tutorials.html
+- SAS vs R on linedin: http://www.linkedin.com/groups/SAS-versus-R-35222.S.65098787
+- http://stats.stackexchange.com/questions/33780/r-vs-sas-why-is-sas-prefered-by-private-companies
+- Big Data and OSS: http://techcrunch.com/2012/10/27/big-data-right-now-five-trendy-open-source-technologies/
+- http://www.slideshare.net/ianmcook/r-the-good-and-the-bad
+- http://en.wikipedia.org/wiki/Comparison_of_statistical_packages
+
+### Biblio
+- Standford elements of statistical learning: http://www-stat.stanford.edu/~tibs/ElemStatLearn/
+- JHBSM Odd ratios: http://ocw.jhsph.edu/courses/MethodsInBiostatisticsII/PDFs/lecture24.pdf
+- http://en.wikipedia.org/wiki/Odds_ratio
+- http://en.wikipedia.org/wiki/Poisson_regression
+- http://en.wikipedia.org/wiki/Design_of_experiments
+- wired A/B : http://www.wired.com/business/2012/04/ff_abtesting/3/
+
+- GLM and glm: http://en.wikipedia.org/wiki/Comparison_of_general_and_generalized_linear_models
+- http://en.wikipedia.org/wiki/A/B_testing
+- http://hadoop.apache.org/
+
+### Usefull links
+- ubuntu one: https://one.ubuntu.com/files/#f=u%2F~%2FDocuments
+
+W5
+----
+### ANOVA
+
+Outcome is still quantitative
+You have multiple explanatory variables
+order is important
+
+A/B testing: http://www.wired.com/business/2012/04/ff_abtesting/
+
+Loading data
+```{r}
+download.file("http://www.rossmanchance.com/iscam2/data/movies03RT.txt",
+              destfile="./data/movies.txt")
+movies <- read.table("./data/movies.txt",sep="\t",header=T,quote="")
+head(movies)
+```
+
+Simple ANOVA
+```{r}
+aovObject <- aov(movies$score ~ movies$rating)
+aovObject
+summary(aovObject)
+aovObject$coeff
+aovObject2 <- aov(movies$score ~ movies$rating + movies$genre)
+aovObject2
+summary(aovObject2)
+aovObject4 <- aov(movies$score ~ movies$genre + movies$rating + movies$box.office)
+summary(aovObject4)
+```
+
+Wikipedia on Experimental Design
+Wikipedia on ANOVA
+Wikipedia on A/B Testing
+
+### Binary outcome
+
+Frequently we care about outcomes that have two values
+Called binary outcomes or 0/1 outcomes
+
+Pr(RWi|RSi,b0,b1) = exp(b0 + b1RSi)/1 + exp(b0 + b1RSi)
+
+```{r}
+download.file("https://dl.dropbox.com/u/7710864/data/ravensData.rda",
+              destfile="./data/ravensData.rda",method="wget")
+load("./data/ravensData.rda")
+head(ravensData)
+```
+
+OR=1: equiv
+OR=4
+OR=inf: max effect
+
+log reg
+```{r}
+logRegRavens <- glm(ravensData$ravenWinNum ~ ravensData$ravenScore,family="binomial")
+summary(logRegRavens)
+exp(logRegRavens$coeff)
+exp(confint(logRegRavens))
+anova(logRegRavens) # ,test="Chisq")
+```
+
+Fitted values
+
+```{r}
+plot(ravensData$ravenScore,logRegRavens$fitted,pch=19,col="blue",xlab="Score",ylab="Prob Ravens Win")
+```
+
+Simpson paradox+++ see wiki
+
+- Odds ratio of 1 = no difference in odds
+- Log odds ratio of 0 = no difference in odds
+- Odds ratio < 0.5 or > 2 commonly a "moderate effect"
+- Relative risk  often easier to interpret, harder to estimate
+- For small probabilities RR  OR but they are not the same!
+
+### poisson regression
+#### Count outcome
+
+Many data take the form of counts
+Data may also be in the form of rates
+Linear regression with transformation is an option
+
+log(outcomeEstimated) = coef * factor + intersect
+outcomeEstimated = exp(interstec) * exp(faxtor * coef)
+
+#### fitting rates; example number 
+
+The trick is in the offset parameter. visits+1 because of zeros in coutcome. data parameter to find visits.
+
+Use sandwich/overdispersion if mean <> var (poisson assumption)
+
+```{r}
+#download.file("https://dl.dropbox.com/u/7710864/data/gaData.rda",destfile="./data/gaData.rda",method="wget")
+load("./data/gaData.rda")
+gaData$julian <- julian(gaData$date)
+
+glm2 <- glm(gaData$simplystats ~ julian(gaData$date),offset=log(visits+1),  
+            family="poisson",dat=gaData)
+```
+
+pscl allows zero values to validity with log transform log(0)
+
+
+```{r fig.width=7, fig.height=6}
+plot(julian(gaData$date),glm2$fitted,col="blue",pch=19,xlab="Date",ylab="Fitted Counts")
+points(julian(gaData$date),glm1$fitted,col="red",pch=19)
+```
+
+```{r fig.width=7, fig.height=6}
+plot(julian(gaData$date),gaData$simplystats/(gaData$visits+1),col="grey",xlab="Date",
+ylab="Fitted Rates",pch=19)
+lines(julian(gaData$date),glm2$fitted/(gaData$visits+1),col="blue",lwd=3)
+```
+
+
+### stepwise
+
+```{r}
+movies <- movies[,-1]
+lm1 <- lm(score ~ .,data=movies)
+aicFormula <- step(lm1)
+```
